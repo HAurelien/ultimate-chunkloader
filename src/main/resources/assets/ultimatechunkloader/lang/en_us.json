@@ -1,0 +1,16 @@
+{
+  "creativetab.ultimatechunkloader.command_tab": "Debug items",
+
+  "item.ultimatechunkloader.chunk_remote": "Chunk remote",
+  "tooltip.ultimatechunkloader.chunk_remote.no_coordinates": "Remote coordinates not yet set",
+  "tooltip.ultimatechunkloader.chunk_remote.with_coordinates": "Coordinates of the chunk are {X:%s, Z:%s}",
+
+  "item.ultimatechunkloader.debug_stick": "Debug stick",
+
+  "message.ultimatechunkloader.debug_stick.message_mode_0": "Shift+interact to change the effect of the stick",
+  "message.ultimatechunkloader.debug_stick.message_mode_2": "All loaded chunks should technically be removed",
+
+  "tooltip.ultimatechunkloader.debug_stick.general": "Created to help debugging %s, right click to use and shift right click to change mode",
+  "tooltip.ultimatechunkloader.debug_stick.mode_1": "Display multiple information from the ChunkHelper",
+  "tooltip.ultimatechunkloader.debug_stick.mode_2": "Forcefully remove all loaded chunks (will break the display of the remotes)"
+}

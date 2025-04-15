@@ -1,6 +1,7 @@
 package com.habermacheraurelien.ultimatechunkloader.datagen;
 
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
+import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -17,6 +18,8 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
+        basicItem(ModItems.CHUNK_REMOTE.get());
+        basicItem(ModItems.DEBUG_STICK.get());
     }
 
     public void buttonItem(DeferredBlock<?> block, DeferredBlock<Block> baseBlock) {
