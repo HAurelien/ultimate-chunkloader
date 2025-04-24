@@ -1,17 +1,13 @@
 package com.habermacheraurelien.ultimatechunkloader;
 
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
-import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkLoader;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import com.habermacheraurelien.ultimatechunkloader.creativemodtab.ModCreativeModTabClass;
 import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
-import net.neoforged.neoforge.common.world.chunk.TicketHelper;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import org.slf4j.Logger;
 
@@ -27,7 +23,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -41,6 +36,10 @@ public class UltimateChunkLoaderMod {
     public static final TicketController TICKET_CONTROLLER;
 
     static {
+        // Add Utils
+
+        // Get the ticketHelper class
+        // TODO: verify how relevant is the ResourceLocation
         TICKET_CONTROLLER = new TicketController(ResourceLocation.fromNamespaceAndPath("chunkloaders", "chunks"),
                 ((level, ticketHelper) -> {
                     ChunkUpdateHandler.get(level).setTicketHelper(ticketHelper);

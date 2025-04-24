@@ -1,11 +1,17 @@
 {
   "creativetab.ultimatechunkloader.command_tab": "Debug items",
+  "creativetab.ultimatechunkloader.block_tab": "Block tab",
 
   "item.ultimatechunkloader.chunk_remote": "Chunk remote",
+
   "tooltip.ultimatechunkloader.chunk_remote.no_coordinates": "Remote coordinates not yet set",
   "tooltip.ultimatechunkloader.chunk_remote.with_coordinates": "Coordinates of the chunk are {X:%s, Z:%s}",
+  "tooltip.ultimatechunkloader.chunk_remote.on": "Chunk state : §aON§r",
+  "tooltip.ultimatechunkloader.chunk_remote.off": "Chunk state : §4OFF§r",
 
   "item.ultimatechunkloader.debug_stick": "Debug stick",
+
+  "block.ultimatechunkloader.chunk_anchor": "Chunk anchor",
 
   "message.ultimatechunkloader.debug_stick.message_mode_0": "Shift+interact to change the effect of the stick",
   "message.ultimatechunkloader.debug_stick.message_mode_2": "All loaded chunks should technically be removed",

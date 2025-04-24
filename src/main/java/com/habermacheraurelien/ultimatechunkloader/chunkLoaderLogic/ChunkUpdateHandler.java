@@ -1,40 +1,53 @@
 package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic;
 
-import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.ClientChunkUpdateHolder;
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.GenericChunkUpdateHolder;
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.ServerChunkUpdateHolder;
+import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.gui.MinecraftServerGui;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.common.world.chunk.TicketHelper;
 import org.slf4j.Logger;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-
 public class ChunkUpdateHandler {
     private static ChunkUpdateHandler INSTANCE;
-    private Level LEVEL;
+    private GenericChunkUpdateHolder HOLDER_INSTANCE;
     private ChunkLoader chunkLoader;
     private TicketHelper TICKET_HELPER;
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static Level currentLevel;
 
     public static ChunkUpdateHandler get(Level level) {
-        if (level.isClientSide){
-            throw new InvalidParameterException("Chunks can only be loaded server-side");
-        }
         if(INSTANCE == null){
             INSTANCE = new ChunkUpdateHandler(level);
         }
+        currentLevel = level;
         return INSTANCE;
     }
 
     private ChunkUpdateHandler(Level level) {
-        this.LEVEL = level;
         this.chunkLoader = ChunkLoader.get(level);
+        if (level.isClientSide){
+            if(HOLDER_INSTANCE == null){
+                HOLDER_INSTANCE = ClientChunkUpdateHolder.get(level);
+            }
+        }
+        else {
+            if(HOLDER_INSTANCE == null){
+                HOLDER_INSTANCE = ServerChunkUpdateHolder.get(level);
+            }
+        }
     }
 
-    public void addChunkToMonitor(Player player, ChunkPos chunkPos){
+    public void start(Player player, ChunkPos chunkPos){
         try {
             chunkLoader.addChunkToLoad(chunkPos);
         }
@@ -43,15 +56,24 @@ public class ChunkUpdateHandler {
         }
     }
 
-    public void updateChunkToMonitor(Player player, ChunkPos chunkPos){
+    private void stop(Player player, ChunkPos chunkPos){
+        if(!currentLevel.isClientSide){
+            try {
+                chunkLoader.removeChunkToLoad(chunkPos);
+            }catch (Exception e){
+                LOGGER.error("Error in ChunkLoader while trying to remove a chunk : " + e.getLocalizedMessage());
+            }
+        }
     }
 
-    public void stopChunkUpdateMonitoring(Player player, ChunkPos chunkPos){
-        try {
-            chunkLoader.removeChunkToLoad(chunkPos);
-        }catch (Exception e){
-            LOGGER.error("Error in ChunkLoader while trying to remove a chunk : " + e.getLocalizedMessage());
-        }
+    public void addChunkMonitoring(Player player, ChunkPos chunkPos){
+        HOLDER_INSTANCE.addChunk(chunkPos, player);
+        start(player, chunkPos);
+    }
+
+    public void removeChunkMonitoring(Player player, ChunkPos chunkPos){
+        HOLDER_INSTANCE.removeChunk(chunkPos, player);
+        stop(player, chunkPos);
     }
 
     public void setTicketHelper(TicketHelper ticketHelper) {
@@ -64,6 +86,10 @@ public class ChunkUpdateHandler {
     }
 
     public void removeAllChunks(Player player) {
-        chunkLoader.CHUNKS_LOADED.forEach(chunk -> stopChunkUpdateMonitoring(player, chunk));
+        chunkLoader.CHUNKS_LOADED.forEach(chunk -> stop(player, chunk));
+    }
+
+    public boolean isChunkLoaded(ChunkPos currentChunkPos) {
+        return chunkLoader.CHUNKS_LOADED.contains(currentChunkPos);
     }
 }

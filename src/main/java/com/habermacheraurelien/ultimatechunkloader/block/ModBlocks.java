@@ -1,10 +1,14 @@
 package com.habermacheraurelien.ultimatechunkloader.block;
 
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
+import com.habermacheraurelien.ultimatechunkloader.block.custom.ChunkAnchorBlock;
 import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -13,6 +17,16 @@ import java.util.function.Supplier;
 
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(UltimateChunkLoaderMod.MOD_ID);
+
+
+    public static final DeferredBlock<Block> CHUNK_ANCHOR = registerBlock(ChunkAnchorBlock.ID, () ->
+            new ChunkAnchorBlock(BlockBehaviour.Properties
+                    .of()
+                    .strength(1f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.ANVIL)
+                    .pushReaction(PushReaction.IGNORE)
+                    .explosionResistance(1200.0F)));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
@@ -27,4 +41,5 @@ public class ModBlocks {
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
     }
+
 }

@@ -1,6 +1,7 @@
 package com.habermacheraurelien.ultimatechunkloader.datagen;
 
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
+import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -15,6 +16,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
+        blockWithItem(ModBlocks.CHUNK_ANCHOR);
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock) {
