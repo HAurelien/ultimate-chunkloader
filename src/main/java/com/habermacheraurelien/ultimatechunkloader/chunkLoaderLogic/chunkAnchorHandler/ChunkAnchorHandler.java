@@ -1,6 +1,6 @@
 package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler;
 
-import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockEntity;
+import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
 import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -12,12 +12,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ChunkAnchorHandler {
-    private static final ArrayList<ChunkAnchorBlockEntity> chunkAnchorBlockArrayList = new ArrayList<ChunkAnchorBlockEntity>();
+    private static final ArrayList<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<ChunkAnchorBlockModel>();
 
     private static Integer getBlockId(BlockPos pos){
-        Optional<ChunkAnchorBlockEntity> chunkAnchorBlock = chunkAnchorBlockArrayList.stream()
+        Optional<ChunkAnchorBlockModel> chunkAnchorBlock = chunkAnchorBlockArrayList.stream()
                 .filter(monitoredChunk -> monitoredChunk.isAtPos(pos)).findFirst();
         if(chunkAnchorBlock.isPresent()){
             return chunkAnchorBlock.get().getId();
@@ -25,9 +26,9 @@ public class ChunkAnchorHandler {
         return null;
     }
 
-    private static ChunkAnchorBlockEntity getBlockById(Integer id){
+    private static ChunkAnchorBlockModel getBlockById(Integer id){
         return chunkAnchorBlockArrayList.stream()
-                .filter(chunkAnchorBlockEntity -> chunkAnchorBlockEntity.getId() == id)
+                .filter(chunkAnchorBlockModel -> chunkAnchorBlockModel.getId() == id)
                 .findFirst().orElseGet(null);
     }
 
@@ -40,7 +41,7 @@ public class ChunkAnchorHandler {
         Player player = Minecraft.getInstance().player;
         if(!exist && player != null){
             player.sendSystemMessage(Component.literal("Anchor added to the list !"));
-            chunkAnchorBlockArrayList.add(new ChunkAnchorBlockEntity(pos, level.dimensionType()));
+            chunkAnchorBlockArrayList.add(new ChunkAnchorBlockModel(pos, level.dimension().location().getPath()));
         }
     }
 
@@ -56,36 +57,36 @@ public class ChunkAnchorHandler {
         if(level.isClientSide){
             return;
         }
-        chunkAnchorBlockArrayList.removeIf(chunkAnchorBlockEntity ->
-                chunkAnchorBlockEntity.isAtPos(blockPos) && !chunkAnchorBlockEntity.isActive());
+        chunkAnchorBlockArrayList.removeIf(chunkAnchorBlockModel ->
+                chunkAnchorBlockModel.isAtPos(blockPos) && !chunkAnchorBlockModel.isActive());
     }
 
-    public static ChunkAnchorBlockEntity getAnchor(BlockPos pos, Level level) {
+    public static ChunkAnchorBlockModel getAnchor(BlockPos pos, Level level) {
         if(level.isClientSide){
             return null;
         }
-        Optional<ChunkAnchorBlockEntity> block = chunkAnchorBlockArrayList.stream()
-                .filter(chunkAnchorBlockEntity -> chunkAnchorBlockEntity.isAtPos(pos))
+        Optional<ChunkAnchorBlockModel> block = chunkAnchorBlockArrayList.stream()
+                .filter(chunkAnchorBlockModel -> chunkAnchorBlockModel.isAtPos(pos))
                 .findFirst();
         return block.orElse(null);
     }
 
-    public static void registerBlockToPlayer(BlockPos pos, Level level, Player player){
+    public static void registerBlockToPlayer(BlockPos pos, Level level, UUID playerId){
         if(level.isClientSide){
            return;
         }
         Integer id = getBlockId(pos);
         if(id != null){
-            PlayerTracker.addBlock(id, level, player);
+            PlayerTracker.addBlock(id, level, playerId);
         }
     }
 
-    public static List<ChunkAnchorBlockEntity> getAllAnchorsKnownByPlayer(Level level, Player player){
+    public static List<ChunkAnchorBlockModel> getAllAnchorsKnownByPlayer(Level level, UUID playerId){
         if(level.isClientSide){
             return null;
         }
         PlayerAnchorTrackerModel playerAnchorTrackerModel = PlayerTracker
-                .getAllIdsDiscoveredByPlayer(level, player).orElseGet(null);
+                .getAllIdsDiscoveredByPlayer(level, playerId).orElseGet(null);
         if(playerAnchorTrackerModel == null){
             return null;
         }

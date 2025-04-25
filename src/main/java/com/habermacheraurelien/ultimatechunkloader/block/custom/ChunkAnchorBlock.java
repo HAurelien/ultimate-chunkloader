@@ -1,8 +1,6 @@
 package com.habermacheraurelien.ultimatechunkloader.block.custom;
 
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.ChunkAnchorHandler;
-import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.PlayerTracker;
-import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -25,7 +23,7 @@ public class ChunkAnchorBlock extends Block {
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                         BlockHitResult hitResult) {
         if(!level.isClientSide){
-            ChunkAnchorHandler.registerBlockToPlayer(pos, level, player);
+            ChunkAnchorHandler.registerBlockToPlayer(pos, level, player.getUUID());
         }
         return super.useWithoutItem(state, level, pos, player, hitResult);
     }

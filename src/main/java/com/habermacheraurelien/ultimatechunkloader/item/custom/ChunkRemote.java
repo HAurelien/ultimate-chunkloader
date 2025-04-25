@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ChunkRemote extends Item {
     public static String ID = "chunk_remote";
@@ -51,7 +52,7 @@ public class ChunkRemote extends Item {
             updateCoordinates(remote, currentChunkPos);
         } else {
             ChunkUpdateHandler chunkUpdateHandler = ChunkUpdateHandler.get(level);
-            switchChunkState(player, currentChunkPos, chunkUpdateHandler);
+            switchChunkState(player.getUUID(), currentChunkPos, chunkUpdateHandler);
             updateChunkState(remote, currentChunkPos, chunkUpdateHandler);
         }
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
@@ -74,12 +75,12 @@ public class ChunkRemote extends Item {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 
-    private void switchChunkState(Player player, ChunkPos chunkPos, ChunkUpdateHandler chunkUpdateHandler){
+    private void switchChunkState(UUID playerId, ChunkPos chunkPos, ChunkUpdateHandler chunkUpdateHandler){
         if(chunkUpdateHandler.isChunkLoaded(chunkPos)) {
-            chunkUpdateHandler.removeChunkMonitoring(player, chunkPos);
+            chunkUpdateHandler.removeChunkMonitoring(playerId, chunkPos);
         }
         else {
-            chunkUpdateHandler.addChunkMonitoring(player, chunkPos);
+            chunkUpdateHandler.addChunkMonitoring(playerId, chunkPos);
         }
     }
 

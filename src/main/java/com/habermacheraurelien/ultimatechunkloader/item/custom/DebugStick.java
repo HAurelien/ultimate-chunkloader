@@ -5,6 +5,8 @@ import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateH
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -49,9 +51,9 @@ public class DebugStick extends Item {
                     case 0:
                         player.sendSystemMessage(Component.translatable(MESSAGE_MODE_0));
                     case 1:
-                        ChunkUpdateHandler.get(level).debugWithChunkHelper(player);
+                        player.sendSystemMessage(Component.literal("Forget it"));
                     case 2:
-                        ChunkUpdateHandler.get(level).removeAllChunks(player);
+                        ChunkUpdateHandler.get(level).removeAllChunks(player.getUUID());
                         player.sendSystemMessage(Component.translatable(MESSAGE_MODE_2));
                 }
             }

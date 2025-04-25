@@ -1,20 +1,31 @@
 package com.habermacheraurelien.ultimatechunkloader.model;
 
-import net.minecraft.world.entity.player.Player;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class PlayerAnchorTrackerModel {
-    private final Player player;
+    private final UUID playerId;
     private final List<Integer> chunksDiscovered = new ArrayList<>(); // TODO: Load from save
 
-    public PlayerAnchorTrackerModel(Player _player) {
-        this.player = _player;
+    public PlayerAnchorTrackerModel(UUID _player) {
+        this.playerId = _player;
     }
 
-    public Player getPlayer(){
-        return player;
+    public PlayerAnchorTrackerModel(List<Integer> _chunksDiscovered, String _playerId) {
+        this.playerId = UUID.fromString(_playerId);
+        this.chunksDiscovered.addAll(_chunksDiscovered);
+    }
+
+    public UUID getPlayerId(){
+        return playerId;
+    }
+
+    private String getPlayerIdAsString(){
+        return playerId.toString();
     }
 
     public boolean contains(Integer anchorId){
@@ -38,4 +49,10 @@ public class PlayerAnchorTrackerModel {
     public List<Integer> getIdList(){
         return chunksDiscovered;
     }
+
+    public static final Codec<PlayerAnchorTrackerModel> playerAnchorTrackerModelCodec = RecordCodecBuilder
+            .create(instance -> instance.group(
+                    Codec.list(Codec.INT).fieldOf("chunk_ids").forGetter(PlayerAnchorTrackerModel::getIdList),
+                    Codec.STRING.fieldOf("uuid").forGetter(PlayerAnchorTrackerModel::getPlayerIdAsString)
+            ).apply(instance, PlayerAnchorTrackerModel::new));
 }

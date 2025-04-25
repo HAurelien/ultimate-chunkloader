@@ -3,19 +3,17 @@ package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.ClientChunkUpdateHolder;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.GenericChunkUpdateHolder;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler.ServerChunkUpdateHolder;
-import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.gui.MinecraftServerGui;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.common.world.chunk.TicketHelper;
 import org.slf4j.Logger;
+
+import java.util.UUID;
 
 public class ChunkUpdateHandler {
     private static ChunkUpdateHandler INSTANCE;
@@ -47,7 +45,7 @@ public class ChunkUpdateHandler {
         }
     }
 
-    public void start(Player player, ChunkPos chunkPos){
+    public void start(UUID playerId, ChunkPos chunkPos){
         try {
             chunkLoader.addChunkToLoad(chunkPos);
         }
@@ -56,7 +54,7 @@ public class ChunkUpdateHandler {
         }
     }
 
-    private void stop(Player player, ChunkPos chunkPos){
+    private void stop(UUID playerId, ChunkPos chunkPos){
         if(!currentLevel.isClientSide){
             try {
                 chunkLoader.removeChunkToLoad(chunkPos);
@@ -66,27 +64,22 @@ public class ChunkUpdateHandler {
         }
     }
 
-    public void addChunkMonitoring(Player player, ChunkPos chunkPos){
-        HOLDER_INSTANCE.addChunk(chunkPos, player);
-        start(player, chunkPos);
+    public void addChunkMonitoring(UUID playerId, ChunkPos chunkPos){
+        HOLDER_INSTANCE.addChunk(chunkPos, playerId);
+        start(playerId, chunkPos);
     }
 
-    public void removeChunkMonitoring(Player player, ChunkPos chunkPos){
-        HOLDER_INSTANCE.removeChunk(chunkPos, player);
-        stop(player, chunkPos);
+    public void removeChunkMonitoring(UUID playerId, ChunkPos chunkPos){
+        HOLDER_INSTANCE.removeChunk(chunkPos, playerId);
+        stop(playerId, chunkPos);
     }
 
     public void setTicketHelper(TicketHelper ticketHelper) {
         TICKET_HELPER = ticketHelper;
     }
 
-    public void debugWithChunkHelper(Player player){
-        player.sendSystemMessage(Component.literal("List of block tickets : " + TICKET_HELPER.getEntityTickets()));
-        player.sendSystemMessage(Component.literal("List of entity tickets : " + TICKET_HELPER.getEntityTickets()));
-    }
-
-    public void removeAllChunks(Player player) {
-        chunkLoader.CHUNKS_LOADED.forEach(chunk -> stop(player, chunk));
+    public void removeAllChunks(UUID playerId) {
+        chunkLoader.CHUNKS_LOADED.forEach(chunk -> stop(playerId, chunk));
     }
 
     public boolean isChunkLoaded(ChunkPos currentChunkPos) {

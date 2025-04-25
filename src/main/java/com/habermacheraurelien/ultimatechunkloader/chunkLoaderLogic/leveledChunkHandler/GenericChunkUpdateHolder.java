@@ -1,10 +1,9 @@
 package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler;
 
-import com.habermacheraurelien.ultimatechunkloader.model.MonitoredChunk;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 
-import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * This is only supposed to keep track of the chunks currently activated.
@@ -18,16 +17,16 @@ public interface GenericChunkUpdateHolder {
     /**
      * Monitors a new chunk. Handle player ownership.
      * @param chunkPos Position of the chunk to monitore
-     * @param player Player responsible for the activation of the chunk
+     * @param playerId UUID responsible for the activation of the chunk
      */
-    public void addChunk(ChunkPos chunkPos, Player player);
+    public void addChunk(ChunkPos chunkPos, UUID playerId);
 
     /**
      * Remove the chunk from the list of the monitored chunks. Handle player ownership.
      * @param chunkPos The position of the chunk
-     * @param player The player who requested the chunk to stop being monitored
+     * @param playerId The player who requested the chunk to stop being monitored
      */
-    public void removeChunk(ChunkPos chunkPos, Player player);
+    public void removeChunk(ChunkPos chunkPos, UUID playerId);
 
     /**
      * Remove the chunk from the list of the monitored chunks.
@@ -40,7 +39,7 @@ public interface GenericChunkUpdateHolder {
      * @param chunkPos
      * @return
      */
-    public Player getChunkOwner(ChunkPos chunkPos);
+    public UUID getChunkOwner(ChunkPos chunkPos);
 
     /**
      * Allow to know if the chunk is monitored
