@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ListChunkAnchorSavedData extends SavedData {
 
-    public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + ":" + "list_chunk_anchor";
+    public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + "." + "list_chunk_anchor";
 
     private List<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<>();
 
