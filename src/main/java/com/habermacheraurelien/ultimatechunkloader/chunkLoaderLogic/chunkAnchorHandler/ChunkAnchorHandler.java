@@ -2,32 +2,41 @@ package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchor
 
 import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
 import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSavedData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class ChunkAnchorHandler {
-    private static final ArrayList<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<ChunkAnchorBlockModel>();
+    private static ListChunkAnchorSavedData chunkAnchorBlockArraySavedData = null;
+    //private static final ArrayList<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<ChunkAnchorBlockModel>();
+
+    public static void setChunkAnchorBlockArraySavedData(ListChunkAnchorSavedData savedData){
+        chunkAnchorBlockArraySavedData = savedData;
+    }
 
     private static Integer getBlockId(BlockPos pos){
-        Optional<ChunkAnchorBlockModel> chunkAnchorBlock = chunkAnchorBlockArrayList.stream()
-                .filter(monitoredChunk -> monitoredChunk.isAtPos(pos)).findFirst();
+        Optional<ChunkAnchorBlockModel> chunkAnchorBlock = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList()
+                .stream().filter(monitoredChunk -> monitoredChunk.isAtPos(pos)).findFirst();
         if(chunkAnchorBlock.isPresent()){
             return chunkAnchorBlock.get().getId();
         }
+        //Optional<ChunkAnchorBlockModel> chunkAnchorBlock = chunkAnchorBlockArrayList.stream()
+        //        .filter(monitoredChunk -> monitoredChunk.isAtPos(pos)).findFirst();
+        //if(chunkAnchorBlock.isPresent()){
+        //    return chunkAnchorBlock.get().getId();
+        //}
         return null;
     }
 
     private static ChunkAnchorBlockModel getBlockById(Integer id){
-        return chunkAnchorBlockArrayList.stream()
+        return chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .filter(chunkAnchorBlockModel -> chunkAnchorBlockModel.getId() == id)
                 .findFirst().orElseGet(null);
     }
@@ -36,12 +45,11 @@ public class ChunkAnchorHandler {
         if(level.isClientSide){
             return;
         }
-        boolean exist = chunkAnchorBlockArrayList.stream()
+        boolean exist = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .anyMatch(monitoredChunk -> monitoredChunk.isAtPos(pos));
         Player player = Minecraft.getInstance().player;
         if(!exist && player != null){
-            player.sendSystemMessage(Component.literal("Anchor added to the list !"));
-            chunkAnchorBlockArrayList.add(new ChunkAnchorBlockModel(pos, level.dimension().location().getPath()));
+            chunkAnchorBlockArraySavedData.addAnchor(new ChunkAnchorBlockModel(pos, level.dimension().location().getPath()));
         }
     }
 
@@ -49,7 +57,7 @@ public class ChunkAnchorHandler {
         if(level.isClientSide){
             return false;
         }
-        return !chunkAnchorBlockArrayList.stream()
+        return !chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .anyMatch(chunkAnchor -> chunkAnchor.isAtPos(blockPos) && chunkAnchor.isActive());
     }
 
@@ -57,15 +65,20 @@ public class ChunkAnchorHandler {
         if(level.isClientSide){
             return;
         }
-        chunkAnchorBlockArrayList.removeIf(chunkAnchorBlockModel ->
-                chunkAnchorBlockModel.isAtPos(blockPos) && !chunkAnchorBlockModel.isActive());
+
+        Optional<ChunkAnchorBlockModel> chunkAnchor = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList()
+                .stream().filter(chunkAnchorBlockModel ->
+                chunkAnchorBlockModel.isAtPos(blockPos) && !chunkAnchorBlockModel.isActive()).findFirst();
+
+        chunkAnchor.ifPresent(chunkAnchorBlockModel ->
+                chunkAnchorBlockArraySavedData.removeAnchor(chunkAnchorBlockModel));
     }
 
     public static ChunkAnchorBlockModel getAnchor(BlockPos pos, Level level) {
         if(level.isClientSide){
             return null;
         }
-        Optional<ChunkAnchorBlockModel> block = chunkAnchorBlockArrayList.stream()
+        Optional<ChunkAnchorBlockModel> block = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .filter(chunkAnchorBlockModel -> chunkAnchorBlockModel.isAtPos(pos))
                 .findFirst();
         return block.orElse(null);

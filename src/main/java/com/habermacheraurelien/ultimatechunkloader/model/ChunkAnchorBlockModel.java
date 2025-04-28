@@ -1,8 +1,14 @@
 package com.habermacheraurelien.ultimatechunkloader.model;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 
 
 public class ChunkAnchorBlockModel {
@@ -59,4 +65,24 @@ public class ChunkAnchorBlockModel {
                     Codec.BOOL.fieldOf("active").forGetter(ChunkAnchorBlockModel::isActive),
                     Codec.INT.fieldOf("id").forGetter(ChunkAnchorBlockModel::getId)
             ).apply(instance, ChunkAnchorBlockModel::new));
+
+    public CompoundTag encode() {
+        CompoundTag tag = new CompoundTag();
+        chunkAnchorBlockModelCodec.encodeStart(JsonOps.INSTANCE, this)
+                .resultOrPartial(System.err::println)
+                        .ifPresent(encoded -> tag.putString("data", encoded.toString()));
+        return tag;
+    }
+
+    // Deserialization method (Decode from CompoundTag)
+    public static ChunkAnchorBlockModel decode(CompoundTag tag) {
+        // Deserialize from NBT using Codec
+        CompoundTag data = tag.getCompound("data");
+
+        DataResult<Pair<ChunkAnchorBlockModel, Tag>> result = chunkAnchorBlockModelCodec.decode(NbtOps.INSTANCE, data);
+
+        return result.resultOrPartial(System.err::println)
+                .map(Pair::getFirst)
+                .orElseThrow(() -> new IllegalArgumentException("Failed to deserialize ChunkAnchorBlockModel"));
+    }
 }

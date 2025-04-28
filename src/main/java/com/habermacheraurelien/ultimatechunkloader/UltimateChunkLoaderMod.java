@@ -2,13 +2,23 @@ package com.habermacheraurelien.ultimatechunkloader;
 
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.ChunkAnchorHandler;
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.PlayerTracker;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import com.habermacheraurelien.ultimatechunkloader.creativemodtab.ModCreativeModTabClass;
 import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
+import com.habermacheraurelien.ultimatechunkloader.util.DataManager;
+import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSavedData;
+import com.habermacheraurelien.ultimatechunkloader.util.save.ListPlayerDiscoveredAnchorSavedData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -75,7 +85,24 @@ public class UltimateChunkLoaderMod {
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        //TODO: load list of updated chunks
+        // This is where you load your data when the server starts
+        MinecraftServer server = event.getServer();
+
+        // Example: Loading saved data
+        DimensionDataStorage dataStorage = server.overworld().getDataStorage();
+
+        ListChunkAnchorSavedData chunkSavedData = dataStorage.computeIfAbsent(
+                ListChunkAnchorSavedData.FACTORY,
+                ListChunkAnchorSavedData.DATA_NAME
+        );
+
+        ListPlayerDiscoveredAnchorSavedData playerSavedData = dataStorage.computeIfAbsent(
+                ListPlayerDiscoveredAnchorSavedData.FACTORY,
+                ListPlayerDiscoveredAnchorSavedData.DATA_NAME
+        );
+
+        ChunkAnchorHandler.setChunkAnchorBlockArraySavedData(chunkSavedData);
+        PlayerTracker.setListPlayerDiscoveredAnchorSavedData(playerSavedData);
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -87,8 +114,21 @@ public class UltimateChunkLoaderMod {
     }
 
     @SubscribeEvent
-    public void onWorldSave(LevelEvent.Save e) {
-        //TODO : Save the loaded chunks
+    public static void onServerStopping(ServerStoppingEvent event){
+        MinecraftServer server = event.getServer();
+
+        // Get the overworld level, as an example
+
+        // Save data when the world is saved
+        DimensionDataStorage dataStorage = server.overworld().getDataStorage();
+
+        // Get the save data of the specific classes
+        ListChunkAnchorSavedData chunkAnchorData = DataManager.getListChunkAnchorSavedData(server);
+        ListPlayerDiscoveredAnchorSavedData discoveredAnchorData = DataManager.getListPlayerDiscoveredAnchorSavedData(server);
+
+        // Save the data back to DimensionDataStorage
+        dataStorage.set(ListChunkAnchorSavedData.DATA_NAME, chunkAnchorData);  // Use the same key as when loading data
+        dataStorage.set(ListPlayerDiscoveredAnchorSavedData.DATA_NAME, discoveredAnchorData);  // Use the same key as when loading data
     }
 
     /**

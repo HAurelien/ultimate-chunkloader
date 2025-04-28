@@ -18,7 +18,7 @@ import java.util.UUID;
 public class ChunkUpdateHandler {
     private static ChunkUpdateHandler INSTANCE;
     private GenericChunkUpdateHolder HOLDER_INSTANCE;
-    private ChunkLoader chunkLoader;
+    private final ChunkLoader chunkLoader;
     private TicketHelper TICKET_HELPER;
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Level currentLevel;
