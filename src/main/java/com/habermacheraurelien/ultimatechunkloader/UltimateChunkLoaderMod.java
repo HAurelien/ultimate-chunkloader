@@ -114,10 +114,8 @@ public class UltimateChunkLoaderMod {
     }
 
     @SubscribeEvent
-    public static void onServerStopping(ServerStoppingEvent event){
+    public void onServerStopping(ServerStoppingEvent event){
         MinecraftServer server = event.getServer();
-
-        // Get the overworld level, as an example
 
         // Save data when the world is saved
         DimensionDataStorage dataStorage = server.overworld().getDataStorage();

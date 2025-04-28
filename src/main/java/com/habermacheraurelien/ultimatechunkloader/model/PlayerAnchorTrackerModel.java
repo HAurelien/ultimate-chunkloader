@@ -9,9 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerAnchorTrackerModel {
     private final UUID playerId;
@@ -54,6 +52,10 @@ public class PlayerAnchorTrackerModel {
 
     public List<Integer> getIdList(){
         return chunksDiscovered;
+    }
+
+    public String getAnchorNameByIndex(int id){
+        return chunksDiscovered.get(id).toString();
     }
 
     public static final Codec<PlayerAnchorTrackerModel> playerAnchorTrackerModelCodec = RecordCodecBuilder
