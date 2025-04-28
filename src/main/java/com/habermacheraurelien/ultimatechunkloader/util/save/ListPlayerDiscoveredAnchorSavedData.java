@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
 
-    public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + ":" + "list_player_discovered_anchor";
+    public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + "." + "list_player_discovered_anchor";
     public static final String ANCHOR_DATA_NAME = "discovered_anchors_per_player";
     private List<PlayerAnchorTrackerModel> playerAnchorTrackerModels = new ArrayList<>();
 
