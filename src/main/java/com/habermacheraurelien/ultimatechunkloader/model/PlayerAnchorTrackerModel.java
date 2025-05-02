@@ -12,7 +12,7 @@ import java.util.*;
 
 public class PlayerAnchorTrackerModel {
     private final UUID playerId;
-    private final List<Integer> chunksDiscovered = new ArrayList<>(); // TODO: Load from save
+    private final List<Integer> chunksDiscovered = new ArrayList<>();
 
     public PlayerAnchorTrackerModel(UUID _player) {
         this.playerId = _player;

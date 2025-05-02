@@ -1,10 +1,12 @@
 package com.habermacheraurelien.ultimatechunkloader.item.custom;
 
+import com.habermacheraurelien.ultimatechunkloader.GUI.screens.AnchorListScreen;
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForAnchorListPayload;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -47,9 +49,13 @@ public class ChunkRemote extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        //ListPlayerDiscoveredAnchorSavedData savedData = DataManager.getListPlayerDiscoveredAnchorSavedData(level.getServer());
         if(level.isClientSide){
             PacketDistributor.sendToServer(new RequestForAnchorListPayload(player.getUUID().toString()));
+            AnchorListScreen anchorScreen = new AnchorListScreen();
+            Minecraft.getInstance().setScreen(anchorScreen);
         }
+
 
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

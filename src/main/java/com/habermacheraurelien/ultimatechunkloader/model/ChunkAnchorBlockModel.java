@@ -68,7 +68,7 @@ public class ChunkAnchorBlockModel {
 
     public CompoundTag encode() {
         CompoundTag tag = new CompoundTag();
-        chunkAnchorBlockModelCodec.encodeStart(JsonOps.INSTANCE, this)
+        chunkAnchorBlockModelCodec.encodeStart(NbtOps.INSTANCE, this)
                 .resultOrPartial(System.err::println)
                         .ifPresent(encoded -> tag.putString("data", encoded.toString()));
         return tag;
