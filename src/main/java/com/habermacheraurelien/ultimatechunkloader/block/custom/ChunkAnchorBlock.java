@@ -25,7 +25,7 @@ public class ChunkAnchorBlock extends Block {
         if(!level.isClientSide){
             ChunkAnchorHandler.registerBlockToPlayer(pos, level, player.getUUID());
         }
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

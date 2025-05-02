@@ -2,7 +2,6 @@ package com.habermacheraurelien.ultimatechunkloader.util.save;
 
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
-import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -16,7 +15,7 @@ public class ListChunkAnchorSavedData extends SavedData {
 
     public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + "." + "list_chunk_anchor";
 
-    private List<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<>();
+    private final List<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<>();
 
     public static final ListChunkAnchorSavedData.Factory<ListChunkAnchorSavedData> FACTORY =
             new SavedData.Factory<ListChunkAnchorSavedData>(

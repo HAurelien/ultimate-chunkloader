@@ -8,16 +8,14 @@ import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import com.habermacheraurelien.ultimatechunkloader.creativemodtab.ModCreativeModTabClass;
 import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
 import com.habermacheraurelien.ultimatechunkloader.util.DataManager;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.ModNetworkRegisterer;
 import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSavedData;
 import com.habermacheraurelien.ultimatechunkloader.util.save.ListPlayerDiscoveredAnchorSavedData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.slf4j.Logger;
 
@@ -33,7 +31,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(UltimateChunkLoaderMod.MOD_ID)
@@ -75,34 +72,14 @@ public class UltimateChunkLoaderMod {
         ModDataComponents.register(modEventBus);
         ModCreativeModTabClass.register(modEventBus);
 
+        // Register network handlers
+        modEventBus.register(ModNetworkRegisterer.class);
+
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        // This is where you load your data when the server starts
-        MinecraftServer server = event.getServer();
-
-        // Example: Loading saved data
-        DimensionDataStorage dataStorage = server.overworld().getDataStorage();
-
-        ListChunkAnchorSavedData chunkSavedData = dataStorage.computeIfAbsent(
-                ListChunkAnchorSavedData.FACTORY,
-                ListChunkAnchorSavedData.DATA_NAME
-        );
-
-        ListPlayerDiscoveredAnchorSavedData playerSavedData = dataStorage.computeIfAbsent(
-                ListPlayerDiscoveredAnchorSavedData.FACTORY,
-                ListPlayerDiscoveredAnchorSavedData.DATA_NAME
-        );
-
-        ChunkAnchorHandler.setChunkAnchorBlockArraySavedData(chunkSavedData);
-        PlayerTracker.setListPlayerDiscoveredAnchorSavedData(playerSavedData);
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -113,8 +90,16 @@ public class UltimateChunkLoaderMod {
         }
     }
 
+    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.DEDICATED_SERVER)
+    public static class ServerModEvents {
+        @SubscribeEvent
+        public static void onServerSetup(FMLClientSetupEvent event) {
+        }
+    }
+
     @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event){
+    public void onServerStopping(ServerStoppingEvent event) {
+
         MinecraftServer server = event.getServer();
 
         // Save data when the world is saved
@@ -128,6 +113,7 @@ public class UltimateChunkLoaderMod {
         dataStorage.set(ListChunkAnchorSavedData.DATA_NAME, chunkAnchorData);  // Use the same key as when loading data
         dataStorage.set(ListPlayerDiscoveredAnchorSavedData.DATA_NAME, discoveredAnchorData);  // Use the same key as when loading data
     }
+
 
     /**
      * This function registers the controller we will use in order to store in Minecraft the automatically updated chunks

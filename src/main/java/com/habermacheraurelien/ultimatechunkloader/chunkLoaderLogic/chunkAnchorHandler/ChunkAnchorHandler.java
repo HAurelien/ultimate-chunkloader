@@ -15,7 +15,6 @@ import java.util.UUID;
 
 public class ChunkAnchorHandler {
     private static ListChunkAnchorSavedData chunkAnchorBlockArraySavedData = null;
-    //private static final ArrayList<ChunkAnchorBlockModel> chunkAnchorBlockArrayList = new ArrayList<ChunkAnchorBlockModel>();
 
     public static void setChunkAnchorBlockArraySavedData(ListChunkAnchorSavedData savedData){
         chunkAnchorBlockArraySavedData = savedData;
@@ -27,11 +26,6 @@ public class ChunkAnchorHandler {
         if(chunkAnchorBlock.isPresent()){
             return chunkAnchorBlock.get().getId();
         }
-        //Optional<ChunkAnchorBlockModel> chunkAnchorBlock = chunkAnchorBlockArrayList.stream()
-        //        .filter(monitoredChunk -> monitoredChunk.isAtPos(pos)).findFirst();
-        //if(chunkAnchorBlock.isPresent()){
-        //    return chunkAnchorBlock.get().getId();
-        //}
         return null;
     }
 
@@ -47,8 +41,7 @@ public class ChunkAnchorHandler {
         }
         boolean exist = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .anyMatch(monitoredChunk -> monitoredChunk.isAtPos(pos));
-        Player player = Minecraft.getInstance().player;
-        if(!exist && player != null){
+        if(!exist){
             chunkAnchorBlockArraySavedData.addAnchor(new ChunkAnchorBlockModel(pos, level.dimension().location().getPath()));
         }
     }
@@ -57,8 +50,8 @@ public class ChunkAnchorHandler {
         if(level.isClientSide){
             return false;
         }
-        return !chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
-                .anyMatch(chunkAnchor -> chunkAnchor.isAtPos(blockPos) && chunkAnchor.isActive());
+        return chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
+                .noneMatch(chunkAnchor -> chunkAnchor.isAtPos(blockPos) && chunkAnchor.isActive());
     }
 
     public static void removeAnchor(BlockPos blockPos, Level level){
@@ -70,8 +63,10 @@ public class ChunkAnchorHandler {
                 .stream().filter(chunkAnchorBlockModel ->
                 chunkAnchorBlockModel.isAtPos(blockPos) && !chunkAnchorBlockModel.isActive()).findFirst();
 
-        chunkAnchor.ifPresent(chunkAnchorBlockModel ->
-                chunkAnchorBlockArraySavedData.removeAnchor(chunkAnchorBlockModel));
+        if(chunkAnchor.isPresent()){
+            PlayerTracker.removeBlockFromAllPlayers(chunkAnchor.get());
+            chunkAnchorBlockArraySavedData.removeAnchor(chunkAnchor.get());
+        }
     }
 
     public static ChunkAnchorBlockModel getAnchor(BlockPos pos, Level level) {
@@ -99,10 +94,7 @@ public class ChunkAnchorHandler {
             return null;
         }
         PlayerAnchorTrackerModel playerAnchorTrackerModel = PlayerTracker
-                .getAllIdsDiscoveredByPlayer(level, playerId).orElseGet(null);
-        if(playerAnchorTrackerModel == null){
-            return null;
-        }
+                .getAllIdsDiscoveredByPlayer(level, playerId);
         return playerAnchorTrackerModel.getIdList().stream().map(ChunkAnchorHandler::getBlockById).toList();
     }
 }

@@ -15,7 +15,7 @@ public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
 
     public static final String DATA_NAME = UltimateChunkLoaderMod.MOD_ID + "." + "list_player_discovered_anchor";
     public static final String ANCHOR_DATA_NAME = "discovered_anchors_per_player";
-    private List<PlayerAnchorTrackerModel> playerAnchorTrackerModels = new ArrayList<>();
+    private final List<PlayerAnchorTrackerModel> playerAnchorTrackerModels = new ArrayList<>();
 
     public static final ListPlayerDiscoveredAnchorSavedData.Factory<ListPlayerDiscoveredAnchorSavedData> FACTORY =
             new SavedData.Factory<ListPlayerDiscoveredAnchorSavedData>(
@@ -43,15 +43,20 @@ public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
     }
 
     public PlayerAnchorTrackerModel getPlayerAnchorFromPlayer(UUID playerId){
-        return playerAnchorTrackerModels.stream()
+        PlayerAnchorTrackerModel playerAnchorTrackerModel = playerAnchorTrackerModels.stream()
                 .filter(anchorList -> anchorList.getPlayerId().equals(playerId))
-                .findFirst().orElseGet(null);
+                .findFirst().orElse(null);
+
+        if(playerAnchorTrackerModel == null){
+            playerAnchorTrackerModel = new PlayerAnchorTrackerModel(playerId);
+            addPlayerAnchor(playerAnchorTrackerModel);
+        }
+        return playerAnchorTrackerModel;
     }
 
-    public PlayerAnchorTrackerModel getPlayerAssociatedWithAnchorId(int anchorId){
+    public List<PlayerAnchorTrackerModel> getAllPlayersPlayerAssociatedWithAnchorId(int anchorId){
         return playerAnchorTrackerModels.stream()
-                .filter(anchorList -> anchorList.contains(anchorId))
-                .findFirst().orElseGet(null);
+                .filter(anchorList -> anchorList.contains(anchorId)).toList();
     }
 
     // Deserialization logic
@@ -67,5 +72,11 @@ public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
         compoundTag.put(ANCHOR_DATA_NAME, playerAnchorsTag);
 
         return compoundTag;
+    }
+
+    public void removeFromAllPlayers(int anchorId) {
+        playerAnchorTrackerModels.stream()
+                .filter(tracker -> tracker.getIdList().contains(anchorId))
+                .forEach(tracker -> tracker.removeAnchor(anchorId));
     }
 }

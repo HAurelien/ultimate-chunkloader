@@ -1,14 +1,10 @@
 package com.habermacheraurelien.ultimatechunkloader.item.custom;
 
-import com.habermacheraurelien.ultimatechunkloader.GUI.screens.AnchorListScreen;
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
-import com.habermacheraurelien.ultimatechunkloader.util.DataManager;
-import com.habermacheraurelien.ultimatechunkloader.util.save.ListPlayerDiscoveredAnchorSavedData;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForAnchorListPayload;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +17,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.UUID;
@@ -50,19 +47,10 @@ public class ChunkRemote extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        ListPlayerDiscoveredAnchorSavedData savedData = DataManager.getListPlayerDiscoveredAnchorSavedData(level.getServer());
+        if(level.isClientSide){
+            PacketDistributor.sendToServer(new RequestForAnchorListPayload(player.getUUID().toString()));
+        }
 
-        AnchorListScreen anchorScreen = new AnchorListScreen(savedData.getPlayerAnchorFromPlayer(player.getUUID()));
-        Minecraft.getInstance().setScreen(anchorScreen);
-        /*ItemStack remote = player.getItemInHand(usedHand);
-        ChunkPos currentChunkPos = player.chunkPosition();
-        if(Screen.hasShiftDown()){
-            updateCoordinates(remote, currentChunkPos);
-        } else {
-            ChunkUpdateHandler chunkUpdateHandler = ChunkUpdateHandler.get(level);
-            switchChunkState(player.getUUID(), currentChunkPos, chunkUpdateHandler);
-            updateChunkState(remote, currentChunkPos, chunkUpdateHandler);
-        }*/
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 

@@ -3,7 +3,6 @@ package com.habermacheraurelien.ultimatechunkloader.model;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -58,7 +57,7 @@ public class PlayerAnchorTrackerModel {
         return chunksDiscovered.get(id).toString();
     }
 
-    public static final Codec<PlayerAnchorTrackerModel> playerAnchorTrackerModelCodec = RecordCodecBuilder
+    public static final Codec<PlayerAnchorTrackerModel> CODEC = RecordCodecBuilder
             .create(instance -> instance.group(
                     Codec.list(Codec.INT).fieldOf("chunk_ids").forGetter(PlayerAnchorTrackerModel::getIdList),
                     Codec.STRING.fieldOf("uuid").forGetter(PlayerAnchorTrackerModel::getPlayerIdAsString)
@@ -67,9 +66,9 @@ public class PlayerAnchorTrackerModel {
 
     public CompoundTag encode() {
         CompoundTag tag = new CompoundTag();
-        playerAnchorTrackerModelCodec.encodeStart(JsonOps.INSTANCE, this)
+        CODEC.encodeStart(NbtOps.INSTANCE, this)  // Use NbtOps for consistent NBT serialization
                 .resultOrPartial(System.err::println)
-                .ifPresent(encoded -> tag.putString("data", encoded.toString()));
+                .ifPresent(encoded -> tag.put("data", encoded));  // Store the actual NBT data, not a string
         return tag;
     }
 
@@ -78,10 +77,15 @@ public class PlayerAnchorTrackerModel {
         // Deserialize from NBT using Codec
         CompoundTag data = tag.getCompound("data");
 
-        DataResult<Pair<PlayerAnchorTrackerModel, Tag>> result = playerAnchorTrackerModelCodec.decode(NbtOps.INSTANCE, data);
+        DataResult<Pair<PlayerAnchorTrackerModel, Tag>> result = CODEC.decode(NbtOps.INSTANCE, data);
 
         return result.resultOrPartial(System.err::println)
                 .map(Pair::getFirst)
                 .orElseThrow(() -> new IllegalArgumentException("Failed to deserialize ChunkAnchorBlockModel"));
+    }
+
+    @Override
+    public String toString(){
+        return "{player : " + playerId.toString() + ", chunk list : " + chunksDiscovered.toString() + "}";
     }
 }

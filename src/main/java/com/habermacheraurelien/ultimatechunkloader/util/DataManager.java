@@ -4,7 +4,6 @@ import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSave
 import com.habermacheraurelien.ultimatechunkloader.util.save.ListPlayerDiscoveredAnchorSavedData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 public class DataManager {
