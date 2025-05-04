@@ -70,7 +70,6 @@ public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
             playerAnchorsTag.add(playerAnchor.encode()); // Assuming `encode()` serializes to NBT
         }
         compoundTag.put(ANCHOR_DATA_NAME, playerAnchorsTag);
-
         return compoundTag;
     }
 
@@ -78,5 +77,6 @@ public class ListPlayerDiscoveredAnchorSavedData extends SavedData {
         playerAnchorTrackerModels.stream()
                 .filter(tracker -> tracker.getIdList().contains(anchorId))
                 .forEach(tracker -> tracker.removeAnchor(anchorId));
+        setDirty();
     }
 }

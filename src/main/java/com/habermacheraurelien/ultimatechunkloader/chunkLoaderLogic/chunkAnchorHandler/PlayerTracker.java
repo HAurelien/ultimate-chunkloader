@@ -9,10 +9,6 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 public class PlayerTracker {
-    private final static String SAVE_NAME = UltimateChunkLoaderMod.MOD_ID + ":" + "player_tracker";
-
-    //private final static List<PlayerAnchorTrackerModel> list_player_anchor = new ArrayList<>();
-
     public static ListPlayerDiscoveredAnchorSavedData listPlayerDiscoveredAnchorSavedData = null;
 
     public static void setListPlayerDiscoveredAnchorSavedData(ListPlayerDiscoveredAnchorSavedData savedData){
@@ -24,6 +20,7 @@ public class PlayerTracker {
             PlayerAnchorTrackerModel tracker = listPlayerDiscoveredAnchorSavedData
                     .getPlayerAnchorFromPlayer(playerId);
             tracker.addAnchor(blockId);
+            listPlayerDiscoveredAnchorSavedData.setDirty();
         }
     }
 

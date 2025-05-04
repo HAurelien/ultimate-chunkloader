@@ -1,8 +1,10 @@
 package com.habermacheraurelien.ultimatechunkloader.GUI.screens;
 
 import com.habermacheraurelien.ultimatechunkloader.GUI.ModUpdatableScreen;
+import com.habermacheraurelien.ultimatechunkloader.GUI.actionHandlers.AnchorListActionsHandler;
 import com.habermacheraurelien.ultimatechunkloader.GUI.dataHandlers.AnchorListDataHolder;
-import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.GUI.model.ScreenAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -11,7 +13,7 @@ import net.minecraft.network.chat.Component;
 
 public class AnchorListScreen extends ModUpdatableScreen {
 
-    private PlayerAnchorTrackerModel anchors; // All the anchors
+    private ScreenAnchorTrackerModel anchors; // All the anchors
     private final int itemsPerPage = 6; // The number of items per page
     private int currentPage = 0; // The current page the user is on
     private boolean dataChanged = false;
@@ -24,7 +26,7 @@ public class AnchorListScreen extends ModUpdatableScreen {
     @Override
     protected void init() {
         AnchorListDataHolder.addListener(this);
-        anchors = AnchorListDataHolder.playerAnchorTrackerModel();
+        anchors = AnchorListDataHolder.screenAnchorTrackerModel();
         canRender = (anchors != null);
     }
 
@@ -52,7 +54,7 @@ public class AnchorListScreen extends ModUpdatableScreen {
 
         // Calculate the start and end index based on current page
         int startIndex = currentPage * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, anchors.getIdList().size());
+        int endIndex = Math.min(startIndex + itemsPerPage, anchors.getChunkAnchorBlockModelList().size());
 
         int listTop = this.height / 10;
         int listBottom = this.height / 10 * 9;
@@ -80,8 +82,8 @@ public class AnchorListScreen extends ModUpdatableScreen {
             int itemY = textStartHeight + (i - startIndex) * (marginBetweenTextEntries + textHeight); // Space out items vertically
 
             // Get the anchor ID (remove the player ID display)
-            int anchorId = anchors.getIdList().get(i);
-            String chunkText = "Anchor ID: " + anchorId;
+            ChunkAnchorBlockModel anchor = anchors.getChunkAnchorBlockModelList().get(i);
+            String chunkText = "Anchor ID: " + anchor.getId();
 
 
             // Draw a background box behind the text (a little padding)
@@ -89,9 +91,9 @@ public class AnchorListScreen extends ModUpdatableScreen {
             guiGraphics.drawString(font, chunkText, textStartLeft, itemY, 0xFFFFFF); // White text on listTop of the box
 
             // Add an interactable button for each anchor
-            this.createAnchorButton(guiGraphics, anchorId, itemY - marginBetweenTextEntries / 2,
+            this.createAnchorButton(guiGraphics, anchor, itemY - marginBetweenTextEntries / 2,
                     textStartLeft + font.width(chunkText),
-                    font.lineHeight + marginBetweenTextEntries, listWidth, false);
+                    font.lineHeight + marginBetweenTextEntries, listWidth);
         }
 
         // Draw the separator line between the list and the buttons
@@ -128,8 +130,8 @@ public class AnchorListScreen extends ModUpdatableScreen {
     }
 
     // Create a button for each anchor
-    private void createAnchorButton(GuiGraphics guiGraphics, int anchorId, int startY, int startX,
-                                    int maxAvailableHeight, int listWidth, boolean activated) {
+    private void createAnchorButton(GuiGraphics guiGraphics, ChunkAnchorBlockModel anchor, int startY, int startX,
+                                    int maxAvailableHeight, int listWidth) {
         int marginX = 10;
 
         int finalStartX = startX + marginX;
@@ -138,15 +140,15 @@ public class AnchorListScreen extends ModUpdatableScreen {
         int finalStartY = startY;
         int finalHeight = maxAvailableHeight;
 
-        if(activated){
+        if(anchor.isActive()){
             this.addRenderableWidget(Button.builder(Component.literal("Turn off"), button ->
-                    {tmpSendMessage("Button clicked for id turned off : " + anchorId);})
+                            AnchorListActionsHandler.onAnchorUpdateState(anchor.getId()))
                     .bounds(finalStartX, finalStartY, finalWidth, finalHeight)
                     .build());
         }
         else{
             this.addRenderableWidget(Button.builder(Component.literal("Turn on"), button ->
-                    {tmpSendMessage("Button clicked for id turned on : " + anchorId);})
+                    AnchorListActionsHandler.onAnchorUpdateState(anchor.getId()))
                     .bounds(finalStartX, finalStartY, finalWidth, finalHeight)
                     .build());
         }
@@ -165,7 +167,7 @@ public class AnchorListScreen extends ModUpdatableScreen {
 
     // Go to the next page
     private void nextPage() {
-        if ((currentPage + 1) * itemsPerPage < anchors.getIdList().size()) {
+        if ((currentPage + 1) * itemsPerPage < anchors.getChunkAnchorBlockModelList().size()) {
             currentPage++;
         }
     }

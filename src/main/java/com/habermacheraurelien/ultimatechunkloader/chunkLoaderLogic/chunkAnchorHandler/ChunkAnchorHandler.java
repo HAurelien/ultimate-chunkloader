@@ -3,9 +3,7 @@ package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchor
 import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
 import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
 import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSavedData;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -96,5 +94,13 @@ public class ChunkAnchorHandler {
         PlayerAnchorTrackerModel playerAnchorTrackerModel = PlayerTracker
                 .getAllIdsDiscoveredByPlayer(level, playerId);
         return playerAnchorTrackerModel.getIdList().stream().map(ChunkAnchorHandler::getBlockById).toList();
+    }
+
+    public static void changeAnchorStatus(Integer anchorId) {
+        Boolean isActive = chunkAnchorBlockArraySavedData.updateAnchorStatus(anchorId);
+        if(isActive == null){
+            return;
+        }
+        // TODO: Update the chunk when this turns active
     }
 }

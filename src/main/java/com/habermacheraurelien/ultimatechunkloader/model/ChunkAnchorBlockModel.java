@@ -10,13 +10,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 
+import java.util.Optional;
+
 
 public class ChunkAnchorBlockModel {
     private static int ID = 0;
     private final int id;
     private final BlockPos pos;
     private final String dimension;
-    private boolean active = false;
+    private Boolean active = false;
 
     public ChunkAnchorBlockModel(BlockPos _pos, String _dimension){
         pos = _pos;
@@ -31,6 +33,7 @@ public class ChunkAnchorBlockModel {
         }
         id = _id;
         pos = _blockPos;
+        active = _active;
         dimension = _dimension;
     }
 
@@ -68,21 +71,23 @@ public class ChunkAnchorBlockModel {
 
     public CompoundTag encode() {
         CompoundTag tag = new CompoundTag();
-        chunkAnchorBlockModelCodec.encodeStart(NbtOps.INSTANCE, this)
-                .resultOrPartial(System.err::println)
-                        .ifPresent(encoded -> tag.putString("data", encoded.toString()));
+        Optional<Tag> encoded  = chunkAnchorBlockModelCodec.encodeStart(NbtOps.INSTANCE, this).result();
+
+        encoded .ifPresent(encodedTag -> tag.put("data", encodedTag));
         return tag;
     }
 
-    // Deserialization method (Decode from CompoundTag)
+
     public static ChunkAnchorBlockModel decode(CompoundTag tag) {
-        // Deserialize from NBT using Codec
+        // Extract the data from the "data" key in the CompoundTag
         CompoundTag data = tag.getCompound("data");
 
+        // Deserialize the object using the codec from the extracted data
         DataResult<Pair<ChunkAnchorBlockModel, Tag>> result = chunkAnchorBlockModelCodec.decode(NbtOps.INSTANCE, data);
 
         return result.resultOrPartial(System.err::println)
                 .map(Pair::getFirst)
                 .orElseThrow(() -> new IllegalArgumentException("Failed to deserialize ChunkAnchorBlockModel"));
     }
+
 }

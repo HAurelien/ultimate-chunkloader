@@ -5,7 +5,7 @@ import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForAnchorListPayload;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForScreenAnchorTrackerModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -51,7 +51,7 @@ public class ChunkRemote extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         //ListPlayerDiscoveredAnchorSavedData savedData = DataManager.getListPlayerDiscoveredAnchorSavedData(level.getServer());
         if(level.isClientSide){
-            PacketDistributor.sendToServer(new RequestForAnchorListPayload(player.getUUID().toString()));
+            PacketDistributor.sendToServer(new RequestForScreenAnchorTrackerModel(player.getUUID().toString()));
             AnchorListScreen anchorScreen = new AnchorListScreen();
             Minecraft.getInstance().setScreen(anchorScreen);
         }

@@ -1,24 +1,24 @@
 package com.habermacheraurelien.ultimatechunkloader.GUI.dataHandlers;
 
 import com.habermacheraurelien.ultimatechunkloader.GUI.ModUpdatableScreen;
-import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.GUI.model.ScreenAnchorTrackerModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AnchorListDataHolder {
-    private static PlayerAnchorTrackerModel playerAnchorTrackerModel;
+    private static ScreenAnchorTrackerModel screenAnchorTrackerModel;
     private static final List<ModUpdatableScreen> listeners = new ArrayList<>();
 
     public static final String ID_PLAYER_ANCHOR_TRACKER_MODEL = "player_anchor_tracker_model";
 
 
-    public static PlayerAnchorTrackerModel playerAnchorTrackerModel() {
-        return playerAnchorTrackerModel;
+    public static ScreenAnchorTrackerModel screenAnchorTrackerModel() {
+        return screenAnchorTrackerModel;
     }
 
-    public static void setListPlayerDiscoveredAnchorSavedData(PlayerAnchorTrackerModel playerAnchorTrackerModel) {
-        AnchorListDataHolder.playerAnchorTrackerModel = playerAnchorTrackerModel;
+    public static void setScreenAnchorTrackerModel(ScreenAnchorTrackerModel screenAnchorTrackerModel) {
+        AnchorListDataHolder.screenAnchorTrackerModel = screenAnchorTrackerModel;
         onChange();
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 public class ListChunkAnchorSavedData extends SavedData {
@@ -66,5 +67,16 @@ public class ListChunkAnchorSavedData extends SavedData {
 
     public void removeAnchor(ChunkAnchorBlockModel chunkAnchor){
         chunkAnchorBlockArrayList.remove(chunkAnchor);
+    }
+
+    public Boolean updateAnchorStatus(Integer anchorId) {
+        Optional<ChunkAnchorBlockModel> selectedAnchor = chunkAnchorBlockArrayList.stream()
+                .filter(anchor -> anchor.getId() == anchorId).findFirst();
+        if(selectedAnchor.isEmpty()){
+            return null;
+        }
+        selectedAnchor.get().setActive(!selectedAnchor.get().isActive());
+        setDirty();
+        return selectedAnchor.get().isActive();
     }
 }

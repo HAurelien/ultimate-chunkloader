@@ -2,8 +2,9 @@ package com.habermacheraurelien.ultimatechunkloader.util.networking;
 
 import com.habermacheraurelien.ultimatechunkloader.util.networking.handlers.ModClientPayloadHandler;
 import com.habermacheraurelien.ultimatechunkloader.util.networking.handlers.ModServerPayloadHandler;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForAnchorListPayload;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.ResponsePlayerAnchorListPayload;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestChangeAnchorStatus;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForScreenAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.ResponseScreenAnchorTrackerModel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
@@ -15,8 +16,8 @@ public class ModNetworkRegisterer {
         final PayloadRegistrar registrar = event.registrar("1");
 
         registrar.playBidirectional(
-                RequestForAnchorListPayload.TYPE,
-                RequestForAnchorListPayload.STREAM_CODEC,
+                RequestForScreenAnchorTrackerModel.TYPE,
+                RequestForScreenAnchorTrackerModel.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
                         ModClientPayloadHandler::handleRequestPlayerAnchorList,
                         ModServerPayloadHandler::handleRequestPlayerAnchorList
@@ -24,11 +25,21 @@ public class ModNetworkRegisterer {
         );
 
         registrar.playBidirectional(
-                ResponsePlayerAnchorListPayload.TYPE,
-                ResponsePlayerAnchorListPayload.STREAM_CODEC,
+                ResponseScreenAnchorTrackerModel.TYPE,
+                ResponseScreenAnchorTrackerModel.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
                         ModClientPayloadHandler::handleReceivingPlayerAnchorList,
                         ModServerPayloadHandler::handleReceivingPlayerAnchorList
+                )
+        );
+
+
+        registrar.playBidirectional(
+                RequestChangeAnchorStatus.TYPE,
+                RequestChangeAnchorStatus.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        ModClientPayloadHandler::handleRequestChangeAnchorStatus,
+                        ModServerPayloadHandler::handleRequestChangeAnchorStatus
                 )
         );
     }
