@@ -9,83 +9,87 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 
 import java.util.*;
-
 public class PlayerAnchorTrackerModel {
     private final UUID playerId;
-    private final List<Integer> chunksDiscovered = new ArrayList<>();
+    private final Map<Integer, PlayerAnchorPropertiesModel> chunksDiscovered = new HashMap<>();
 
-    public PlayerAnchorTrackerModel(UUID _player) {
-        this.playerId = _player;
+    public PlayerAnchorTrackerModel(UUID playerId) {
+        this.playerId = playerId;
     }
 
-    public PlayerAnchorTrackerModel(List<Integer> _chunksDiscovered, String _playerId) {
-        this.playerId = UUID.fromString(_playerId);
-        this.chunksDiscovered.addAll(_chunksDiscovered);
-    }
-
-    public UUID getPlayerId(){
-        return playerId;
-    }
-
-    private String getPlayerIdAsString(){
-        return playerId.toString();
-    }
-
-    public boolean contains(Integer anchorId){
-        return chunksDiscovered.contains(anchorId);
-    }
-
-    public void addAnchor(Integer anchorId){
-        if(!chunksDiscovered.contains(anchorId)){
-            chunksDiscovered.add(anchorId);
+    public PlayerAnchorTrackerModel(List<PlayerAnchorPropertiesModel> anchors, String playerIdString) {
+        this.playerId = UUID.fromString(playerIdString);
+        for (PlayerAnchorPropertiesModel model : anchors) {
+            chunksDiscovered.put(model.getId(), model);
         }
     }
 
-    public void removeAnchor(Integer anchorId){
+    public UUID getPlayerId() {
+        return playerId;
+    }
+
+    private String getPlayerIdAsString() {
+        return playerId.toString();
+    }
+
+    public boolean contains(Integer anchorId) {
+        return chunksDiscovered.containsKey(anchorId);
+    }
+
+    public void addAnchor(Integer anchorId) {
+        chunksDiscovered.putIfAbsent(anchorId, new PlayerAnchorPropertiesModel(anchorId));
+    }
+
+    public void removeAnchor(Integer anchorId) {
         chunksDiscovered.remove(anchorId);
     }
 
-    public void clearAnchors(){
+    public void clearAnchors() {
         chunksDiscovered.clear();
     }
 
-    public List<Integer> getIdList(){
-        return chunksDiscovered;
+    public Collection<PlayerAnchorPropertiesModel> getAnchorList() {
+        return chunksDiscovered.values();
     }
 
-    public String getAnchorNameByIndex(int id){
-        return chunksDiscovered.get(id).toString();
+    public String getAnchorNameById(Integer anchorId) {
+        return Optional.ofNullable(chunksDiscovered.get(anchorId))
+                .map(PlayerAnchorPropertiesModel::getName)
+                .orElse(null);
     }
 
-    public static final Codec<PlayerAnchorTrackerModel> CODEC = RecordCodecBuilder
-            .create(instance -> instance.group(
-                    Codec.list(Codec.INT).fieldOf("chunk_ids").forGetter(PlayerAnchorTrackerModel::getIdList),
-                    Codec.STRING.fieldOf("uuid").forGetter(PlayerAnchorTrackerModel::getPlayerIdAsString)
-            ).apply(instance, PlayerAnchorTrackerModel::new));
+    public void setAnchorNameById(Integer anchorId, String name) {
+        PlayerAnchorPropertiesModel model = chunksDiscovered.get(anchorId);
+        if (model != null) {
+            model.setName(name);
+        }
+    }
 
+    public static final Codec<PlayerAnchorTrackerModel> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.list(PlayerAnchorPropertiesModel.CODEC)
+                    .fieldOf("anchor_properties")
+                    .forGetter(model -> new ArrayList<>(model.getAnchorList())),
+            Codec.STRING.fieldOf("player_uuid").forGetter(PlayerAnchorTrackerModel::getPlayerIdAsString)
+    ).apply(instance, PlayerAnchorTrackerModel::new));
 
     public CompoundTag encode() {
         CompoundTag tag = new CompoundTag();
-        CODEC.encodeStart(NbtOps.INSTANCE, this)  // Use NbtOps for consistent NBT serialization
+        CODEC.encodeStart(NbtOps.INSTANCE, this)
                 .resultOrPartial(System.err::println)
-                .ifPresent(encoded -> tag.put("data", encoded));  // Store the actual NBT data, not a string
+                .ifPresent(encoded -> tag.put("data", encoded));
         return tag;
     }
 
-    // Deserialization method (Decode from CompoundTag)
     public static PlayerAnchorTrackerModel decode(CompoundTag tag) {
-        // Deserialize from NBT using Codec
         CompoundTag data = tag.getCompound("data");
-
-        DataResult<Pair<PlayerAnchorTrackerModel, Tag>> result = CODEC.decode(NbtOps.INSTANCE, data);
-
-        return result.resultOrPartial(System.err::println)
+        return CODEC.decode(NbtOps.INSTANCE, data)
+                .resultOrPartial(System.err::println)
                 .map(Pair::getFirst)
-                .orElseThrow(() -> new IllegalArgumentException("Failed to deserialize ChunkAnchorBlockModel"));
+                .orElseThrow(() -> new IllegalArgumentException("Failed to deserialize PlayerAnchorTrackerModel"));
     }
 
     @Override
-    public String toString(){
-        return "{player : " + playerId.toString() + ", chunk list : " + chunksDiscovered.toString() + "}";
+    public String toString() {
+        return "{player : " + playerId + ", chunk list : " + chunksDiscovered + "}";
     }
 }

@@ -79,10 +79,10 @@ public class ChunkRemote extends Item {
 
     private void switchChunkState(UUID playerId, ChunkPos chunkPos, ChunkUpdateHandler chunkUpdateHandler){
         if(chunkUpdateHandler.isChunkLoaded(chunkPos)) {
-            chunkUpdateHandler.removeChunkMonitoring(playerId, chunkPos);
+            chunkUpdateHandler.removeChunkMonitoring(chunkPos);
         }
         else {
-            chunkUpdateHandler.addChunkMonitoring(playerId, chunkPos);
+            chunkUpdateHandler.addChunkMonitoring(chunkPos);
         }
     }
 

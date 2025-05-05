@@ -2,9 +2,7 @@ package com.habermacheraurelien.ultimatechunkloader.util.networking;
 
 import com.habermacheraurelien.ultimatechunkloader.util.networking.handlers.ModClientPayloadHandler;
 import com.habermacheraurelien.ultimatechunkloader.util.networking.handlers.ModServerPayloadHandler;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestChangeAnchorStatus;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.RequestForScreenAnchorTrackerModel;
-import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.ResponseScreenAnchorTrackerModel;
+import com.habermacheraurelien.ultimatechunkloader.util.networking.payloads.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
@@ -42,5 +40,26 @@ public class ModNetworkRegisterer {
                         ModServerPayloadHandler::handleRequestChangeAnchorStatus
                 )
         );
+
+        registrar.playBidirectional(
+                RequestChangeAnchorPlayerProperty.TYPE,
+                RequestChangeAnchorPlayerProperty.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        ModClientPayloadHandler::handleRequestChangeAnchorProperty,
+                        ModServerPayloadHandler::handleRequestChangeAnchorProperty
+                )
+        );
+
+
+        registrar.playBidirectional(
+                RequestPlayerForgetAnchor.TYPE,
+                RequestPlayerForgetAnchor.STREAM_CODEC,
+                new DirectionalPayloadHandler<>(
+                        ModClientPayloadHandler::handleRequestPlayerForgetAnchor,
+                        ModServerPayloadHandler::handleRequestPlayerForgetAnchor
+                )
+        );
+
+
     }
 }

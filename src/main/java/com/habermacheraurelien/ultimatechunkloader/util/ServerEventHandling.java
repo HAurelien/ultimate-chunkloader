@@ -33,5 +33,7 @@ public class ServerEventHandling {
 
         ChunkAnchorHandler.setChunkAnchorBlockArraySavedData(chunkSavedData);
         PlayerTracker.setListPlayerDiscoveredAnchorSavedData(playerSavedData);
+
+        ChunkAnchorHandler.init(server);
     }
 }

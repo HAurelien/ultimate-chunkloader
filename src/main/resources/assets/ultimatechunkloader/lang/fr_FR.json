@@ -1,0 +1,30 @@
+{
+  "creativetab.ultimatechunkloader.command_tab": "Item de débug",
+  "creativetab.ultimatechunkloader.block_tab": "Blocks",
+
+  "item.ultimatechunkloader.chunk_remote": "Télécommande de chunk",
+
+  "item.ultimatechunkloader.debug_stick": "Bâton de débug",
+
+  "block.ultimatechunkloader.chunk_anchor": "Ancre de chunk",
+
+  "message.ultimatechunkloader.debug_stick.message_mode_0": "Shift + interaction pour changer l'effet du bâton",
+  "message.ultimatechunkloader.debug_stick.message_mode_2": "Tout les chunks actuellement chargés par le mod devraient être déchargés",
+
+  "tooltip.ultimatechunkloader.debug_stick.general": "Créé pour aider à débug %s, click droit pour utiliser et shift+click droit pour changer de mode",
+  "tooltip.ultimatechunkloader.debug_stick.mode_1": "Affiche de multiples informations du ChunkHelper",
+  "tooltip.ultimatechunkloader.debug_stick.mode_2": "Force la désactivation de tout les chunks (casse l'affichage des chunks activés)",
+  "tooltip.ultimatechunkloader.anchor_state": "Activer ou désactiver le chunk contenant l'ancre",
+
+  "gui.ultimatechunkloader.anchor_state.on": "Désactiver",
+  "gui.ultimatechunkloader.anchor_state.off": "Activer",
+  "gui.ultimatechunkloader.forget_anchor": "Oublier l'ancre",
+
+  "gui.ultimatechunkloader.previous": "Précédent",
+  "gui.ultimatechunkloader.next": "Suivant",
+  "gui.ultimatechunkloader.close": "Fermer",
+  "gui.ultimatechunkloader.page": "Page %s / %s",
+  "gui.ultimatechunkloader.dimension": "Dimension : %s",
+
+  "gui.ultimatechunkloader.title.anchor_discovery_list": "Liste des ancres connues"
+}

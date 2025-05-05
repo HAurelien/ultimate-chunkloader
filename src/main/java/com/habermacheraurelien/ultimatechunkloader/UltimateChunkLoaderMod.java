@@ -46,10 +46,10 @@ public class UltimateChunkLoaderMod {
         // Add Utils
 
         // Get the ticketHelper class
-        // TODO: verify how relevant is the ResourceLocation
         TICKET_CONTROLLER = new TicketController(ResourceLocation.fromNamespaceAndPath("chunkloaders", "chunks"),
                 ((level, ticketHelper) -> {
-                    ChunkUpdateHandler.get(level).setTicketHelper(ticketHelper);
+                    level.getServer().getAllLevels().forEach(lvl ->
+                            ChunkUpdateHandler.get(level).setTicketHelper(ticketHelper));
                 })
         );
     }

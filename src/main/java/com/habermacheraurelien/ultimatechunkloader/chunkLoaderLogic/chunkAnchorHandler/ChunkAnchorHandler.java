@@ -1,9 +1,13 @@
 package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler;
 
+import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
 import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
 import com.habermacheraurelien.ultimatechunkloader.model.PlayerAnchorTrackerModel;
 import com.habermacheraurelien.ultimatechunkloader.util.save.ListChunkAnchorSavedData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -16,6 +20,10 @@ public class ChunkAnchorHandler {
 
     public static void setChunkAnchorBlockArraySavedData(ListChunkAnchorSavedData savedData){
         chunkAnchorBlockArraySavedData = savedData;
+        intiChunks();
+    }
+
+    private static void intiChunks(){
     }
 
     private static Integer getBlockId(BlockPos pos){
@@ -40,7 +48,7 @@ public class ChunkAnchorHandler {
         boolean exist = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
                 .anyMatch(monitoredChunk -> monitoredChunk.isAtPos(pos));
         if(!exist){
-            chunkAnchorBlockArraySavedData.addAnchor(new ChunkAnchorBlockModel(pos, level.dimension().location().getPath()));
+            chunkAnchorBlockArraySavedData.addAnchor(new ChunkAnchorBlockModel(pos, level.dimension()));
         }
     }
 
@@ -52,29 +60,18 @@ public class ChunkAnchorHandler {
                 .noneMatch(chunkAnchor -> chunkAnchor.isAtPos(blockPos) && chunkAnchor.isActive());
     }
 
-    public static void removeAnchor(BlockPos blockPos, Level level){
+    public static void removeAnchor(BlockPos blockPos, ServerLevel level){
         if(level.isClientSide){
             return;
         }
 
-        Optional<ChunkAnchorBlockModel> chunkAnchor = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList()
-                .stream().filter(chunkAnchorBlockModel ->
-                chunkAnchorBlockModel.isAtPos(blockPos) && !chunkAnchorBlockModel.isActive()).findFirst();
+        Optional<ChunkAnchorBlockModel> chunkAnchor = chunkAnchorBlockArraySavedData.getAnchor(blockPos);
 
         if(chunkAnchor.isPresent()){
+            removeAnchorLoading(chunkAnchor.get(), level);
             PlayerTracker.removeBlockFromAllPlayers(chunkAnchor.get());
             chunkAnchorBlockArraySavedData.removeAnchor(chunkAnchor.get());
         }
-    }
-
-    public static ChunkAnchorBlockModel getAnchor(BlockPos pos, Level level) {
-        if(level.isClientSide){
-            return null;
-        }
-        Optional<ChunkAnchorBlockModel> block = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList().stream()
-                .filter(chunkAnchorBlockModel -> chunkAnchorBlockModel.isAtPos(pos))
-                .findFirst();
-        return block.orElse(null);
     }
 
     public static void registerBlockToPlayer(BlockPos pos, Level level, UUID playerId){
@@ -87,20 +84,41 @@ public class ChunkAnchorHandler {
         }
     }
 
-    public static List<ChunkAnchorBlockModel> getAllAnchorsKnownByPlayer(Level level, UUID playerId){
-        if(level.isClientSide){
-            return null;
-        }
-        PlayerAnchorTrackerModel playerAnchorTrackerModel = PlayerTracker
-                .getAllIdsDiscoveredByPlayer(level, playerId);
-        return playerAnchorTrackerModel.getIdList().stream().map(ChunkAnchorHandler::getBlockById).toList();
-    }
-
-    public static void changeAnchorStatus(Integer anchorId) {
-        Boolean isActive = chunkAnchorBlockArraySavedData.updateAnchorStatus(anchorId);
-        if(isActive == null){
+    public static void changeAnchorStatus(MinecraftServer server, Integer anchorId) {
+        Optional<ChunkAnchorBlockModel> anchor = chunkAnchorBlockArraySavedData.getAnchor(anchorId);
+        if(anchor.isEmpty()){
             return;
         }
-        // TODO: Update the chunk when this turns active
+        Boolean isActive = chunkAnchorBlockArraySavedData.updateAnchorStatus(anchorId);
+        ServerLevel level = server.getLevel(anchor.get().getDimension());
+        if (isActive){
+            addAnchorLoading(anchor.get(), level);
+        }
+        else {
+            removeAnchorLoading(anchor.get(), level);
+        }
+    }
+
+    public static void init(MinecraftServer server) {
+        List<ChunkAnchorBlockModel> anchors = chunkAnchorBlockArraySavedData.getChunkAnchorBlockArrayList();
+
+        for (ChunkAnchorBlockModel anchor : anchors) {
+            if (!anchor.isActive()) continue;
+
+            ServerLevel level = server.getLevel(anchor.getDimension());
+            if (level == null) {
+                continue;
+            }
+
+            addAnchorLoading(anchor, level);
+        }
+    }
+
+    private static void removeAnchorLoading(ChunkAnchorBlockModel anchor, ServerLevel level){
+        ChunkUpdateHandler.get(level).removeChunkMonitoring(new ChunkPos(anchor.getPos()));
+    }
+
+    private static void addAnchorLoading(ChunkAnchorBlockModel anchor, ServerLevel level){
+        ChunkUpdateHandler.get(level).addChunkMonitoring(new ChunkPos(anchor.getPos()));
     }
 }

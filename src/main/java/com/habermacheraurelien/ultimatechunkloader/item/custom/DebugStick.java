@@ -53,7 +53,7 @@ public class DebugStick extends Item {
                     case 1:
                         player.sendSystemMessage(Component.literal("Forget it"));
                     case 2:
-                        ChunkUpdateHandler.get(level).removeAllChunks(player.getUUID());
+                        ChunkUpdateHandler.get(level).removeAllChunks();
                         player.sendSystemMessage(Component.translatable(MESSAGE_MODE_2));
                 }
             }

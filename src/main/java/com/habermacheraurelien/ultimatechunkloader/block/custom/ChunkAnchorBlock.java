@@ -3,6 +3,7 @@ package com.habermacheraurelien.ultimatechunkloader.block.custom;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.ChunkAnchorHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -36,19 +37,21 @@ public class ChunkAnchorBlock extends Block {
 
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        if(!ChunkAnchorHandler.canRemoveAnchor(pos, level)){
+        // TODO: add blockstate when anchor active to know if can be destroyed from client
+        if(!ChunkAnchorHandler.canRemoveAnchor(pos, level) || level.isClientSide){
             return false;
         }
-        ChunkAnchorHandler.removeAnchor(pos, level);
+        ChunkAnchorHandler.removeAnchor(pos, (ServerLevel) level);
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
     @Override
     public void onDestroyedByPushReaction(BlockState state, Level level, BlockPos pos, Direction pushDirection, FluidState fluid) {
-        if(!ChunkAnchorHandler.canRemoveAnchor(pos, level)){
+        // TODO: add blockstate when anchor active to know if can be destroyed from client
+        if(!ChunkAnchorHandler.canRemoveAnchor(pos, level) || level.isClientSide){
             return;
         }
-        ChunkAnchorHandler.removeAnchor(pos, level);
+        ChunkAnchorHandler.removeAnchor(pos,(ServerLevel) level);
         super.onDestroyedByPushReaction(state, level, pos, pushDirection, fluid);
     }
 }

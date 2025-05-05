@@ -2,6 +2,7 @@ package com.habermacheraurelien.ultimatechunkloader.util.save;
 
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import com.habermacheraurelien.ultimatechunkloader.model.ChunkAnchorBlockModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -78,5 +79,13 @@ public class ListChunkAnchorSavedData extends SavedData {
         selectedAnchor.get().setActive(!selectedAnchor.get().isActive());
         setDirty();
         return selectedAnchor.get().isActive();
+    }
+
+    public Optional<ChunkAnchorBlockModel> getAnchor(Integer anchorId){
+        return  chunkAnchorBlockArrayList.stream().filter(anchor -> anchor.getId() == anchorId).findFirst();
+    }
+
+    public Optional<ChunkAnchorBlockModel> getAnchor(BlockPos pos){
+        return  chunkAnchorBlockArrayList.stream().filter(anchor -> anchor.isAtPos(pos)).findFirst();
     }
 }
