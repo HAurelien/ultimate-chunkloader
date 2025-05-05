@@ -12,18 +12,38 @@ import com.habermacheraurelien.ultimatechunkloader.util.save.ListPlayerDiscovere
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+/**
+ * ModServerPayloadHandler handles server-side logic for processing network payload requests
+ * related to player anchors, chunk anchors, and anchor properties. The class provides methods
+ * for handling different types of requests such as requesting anchor lists, changing anchor status,
+ * modifying anchor properties, and forgetting anchors.
+ */
 public class ModServerPayloadHandler {
 
+    /**
+     * Handles the reception of a {@link ResponseScreenAnchorTrackerModel} from the client.
+     * This method currently does nothing but can be extended for additional server-side logic.
+     *
+     * @param response the response payload received from the client
+     * @param context the context of the payload, including the player who sent it
+     */
     public static void handleReceivingPlayerAnchorList(final ResponseScreenAnchorTrackerModel response, final IPayloadContext context) {
     }
 
+    /**
+     * Handles the {@link RequestForScreenAnchorTrackerModel} sent by the client.
+     * This method processes the request by fetching the player's anchor list and sending it back to the client
+     * in the form of a {@link ResponseScreenAnchorTrackerModel}.
+     *
+     * @param request the request payload containing the player's UUID
+     * @param context the context of the payload, including the player who sent the request
+     */
     public static void handleRequestPlayerAnchorList(final RequestForScreenAnchorTrackerModel request, final IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
         MinecraftServer server = player.getServer();
@@ -42,6 +62,13 @@ public class ModServerPayloadHandler {
         PacketDistributor.sendToPlayer(player, new ResponseScreenAnchorTrackerModel(trackerModel));
     }
 
+    /**
+     * Handles the {@link RequestChangeAnchorStatus} request sent by the client.
+     * This method processes the request to change the status of a chunk anchor and broadcasts the update to all players.
+     *
+     * @param request the request payload containing the anchor ID whose status needs to be changed
+     * @param context the context of the payload, including the player who sent the request
+     */
     public static void handleRequestChangeAnchorStatus(final RequestChangeAnchorStatus request, final IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
         MinecraftServer server = player.getServer();
@@ -55,6 +82,12 @@ public class ModServerPayloadHandler {
         sendUpdateRequestToAllPlayers(server);
     }
 
+    /**
+     * Broadcasts an update request to all players, refreshing their view of chunk anchors.
+     * This method is used after a chunk anchor's status has changed.
+     *
+     * @param server the Minecraft server
+     */
     private static void sendUpdateRequestToAllPlayers(MinecraftServer server) {
         ListPlayerDiscoveredAnchorSavedData discoveredData = DataManager.getListPlayerDiscoveredAnchorSavedData(server);
         ListChunkAnchorSavedData chunkData = DataManager.getListChunkAnchorSavedData(server);
@@ -65,6 +98,15 @@ public class ModServerPayloadHandler {
         }
     }
 
+    /**
+     * Builds a {@link ScreenAnchorTrackerModel} for a given player, containing a list of chunk anchors
+     * with the player-specific names applied to them.
+     *
+     * @param playerId the UUID of the player whose anchor tracker model is being built
+     * @param discoveredData the list of discovered anchors for all players
+     * @param chunkData the list of all chunk anchors in the game
+     * @return the constructed {@link ScreenAnchorTrackerModel}
+     */
     private static ScreenAnchorTrackerModel buildScreenAnchorTrackerModel(UUID playerId,
                                                                           ListPlayerDiscoveredAnchorSavedData discoveredData,
                                                                           ListChunkAnchorSavedData chunkData) {
@@ -95,6 +137,14 @@ public class ModServerPayloadHandler {
         return new ScreenAnchorTrackerModel(personalizedAnchors);
     }
 
+    /**
+     * Handles the {@link RequestChangeAnchorPlayerProperty} request sent by the client.
+     * This method processes the request to change the properties of a specific anchor (e.g., its name).
+     * If the anchor exists, its properties are updated and the changes are broadcast to all players.
+     *
+     * @param requestChangeAnchorPlayerProperty the request payload containing the new anchor properties
+     * @param iPayloadContext the context of the payload, including the player who sent the request
+     */
     public static void handleRequestChangeAnchorProperty(RequestChangeAnchorPlayerProperty requestChangeAnchorPlayerProperty, IPayloadContext iPayloadContext) {
         ServerPlayer player = (ServerPlayer) iPayloadContext.player();
         MinecraftServer server = player.getServer();
@@ -135,6 +185,15 @@ public class ModServerPayloadHandler {
             player.sendSystemMessage(Component.literal("Error: Anchor with ID " + newProperties.getId() + " not found."));
         }
     }
+
+    /**
+     * Retrieves a merged list of anchors for a specific player, including the player's customized anchor names.
+     *
+     * @param player the player whose anchors are being retrieved
+     * @param listPlayerDiscoveredAnchorSavedData the list of all player-discovered anchors
+     * @param listChunkAnchorSavedData the list of all chunk anchors in the world
+     * @return the list of merged anchors for the player, including custom names
+     */
     private static List<ChunkAnchorBlockModel> getMergedListOfAnchors(ServerPlayer player,
                                                                       ListPlayerDiscoveredAnchorSavedData listPlayerDiscoveredAnchorSavedData,
                                                                       ListChunkAnchorSavedData listChunkAnchorSavedData){
@@ -149,7 +208,9 @@ public class ModServerPayloadHandler {
                 .collect(Collectors.toMap(ChunkAnchorBlockModel::getId, Function.identity()));
 
         // Step 2: Filter and apply names in one pass
-        List<ChunkAnchorBlockModel> filteredList = ofPlayer.getAnchorList().stream()
+        // Apply player's name
+
+        return ofPlayer.getAnchorList().stream()
                 .map(playerAnchor -> {
                     ChunkAnchorBlockModel block = idToBlockMap.get(playerAnchor.getId());
                     if (block != null) {
@@ -160,10 +221,15 @@ public class ModServerPayloadHandler {
                 })
                 .filter(Objects::nonNull)
                 .toList();
-
-        return filteredList;
     }
 
+    /**
+     * Handles the {@link RequestPlayerForgetAnchor} request sent by the client.
+     * This method processes the request to remove an anchor from the player's discovered anchors and broadcasts the update.
+     *
+     * @param requestPlayerForgetAnchor the request payload containing the anchor ID to be forgotten
+     * @param iPayloadContext the context of the payload, including the player who sent the request
+     */
     public static void handleRequestPlayerForgetAnchor(RequestPlayerForgetAnchor requestPlayerForgetAnchor, IPayloadContext iPayloadContext) {
         ServerPlayer player = (ServerPlayer) iPayloadContext.player();
         MinecraftServer server = player.getServer();

@@ -1,6 +1,5 @@
 package com.habermacheraurelien.ultimatechunkloader.util.networking.payloads;
 
-import com.habermacheraurelien.ultimatechunkloader.GUI.model.ScreenAnchorTrackerModel;
 import com.habermacheraurelien.ultimatechunkloader.UltimateChunkLoaderMod;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

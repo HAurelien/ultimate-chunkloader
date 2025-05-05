@@ -40,9 +40,7 @@ public class ModCreativeModTabClass {
                     .withTabsBefore(ResourceLocation.fromNamespaceAndPath(UltimateChunkLoaderMod.MOD_ID, COMMAND_TAB_ID))
                     .icon(() -> new ItemStack(ModItems.DEBUG_STICK.get()))
                     .title(Component.translatable(BLOCK_TAB_TITLE))
-                    .displayItems((parameters, output) -> {
-                        output.accept(ModBlocks.CHUNK_ANCHOR);
-                    }).build()
+                    .displayItems((parameters, output) -> output.accept(ModBlocks.CHUNK_ANCHOR)).build()
     );
 
     public static void register(IEventBus eventBus) {

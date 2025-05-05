@@ -1,7 +1,6 @@
 package com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.leveledChunkHandler;
 
 import com.habermacheraurelien.ultimatechunkloader.model.MonitoredChunkModel;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
@@ -27,7 +26,7 @@ public class ServerChunkUpdateHolder implements GenericChunkUpdateHolder {
     }
 
     private ServerChunkUpdateHolder(Level level){
-        this.LEVEL = level;
+        LEVEL = level;
     }
 
     @Override

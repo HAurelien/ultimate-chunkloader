@@ -6,29 +6,40 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.List;
 
-public class ScreenAnchorTrackerModel {
-    private static List<ChunkAnchorBlockModel> chunkAnchorBlockModelList;
+/**
+ * @param chunkAnchorBlockModelList List of chunk anchor block models known to this instance.
+ */
+public record ScreenAnchorTrackerModel(List<ChunkAnchorBlockModel> chunkAnchorBlockModelList) {
 
+    /**
+     * Codec used for serialization and deserialization of the anchor tracker model.
+     */
     public static final Codec<ScreenAnchorTrackerModel> CODEC = RecordCodecBuilder
             .create(instance -> instance.group(
                     Codec.list(ChunkAnchorBlockModel.chunkAnchorBlockModelCodec).fieldOf("list_anchor")
-                            .forGetter(ScreenAnchorTrackerModel::getChunkAnchorBlockModelList)
+                            .forGetter(ScreenAnchorTrackerModel::chunkAnchorBlockModelList)
             ).apply(instance, ScreenAnchorTrackerModel::new));
 
-    public ScreenAnchorTrackerModel(List<ChunkAnchorBlockModel> chunkAnchorBlockModelList){
-        ScreenAnchorTrackerModel.chunkAnchorBlockModelList = chunkAnchorBlockModelList;
+    /**
+     * Constructs a new screen anchor tracker model with the provided list of anchors.
+     *
+     * @param chunkAnchorBlockModelList The list of anchors.
+     */
+    public ScreenAnchorTrackerModel {
     }
 
-    public List<ChunkAnchorBlockModel> getChunkAnchorBlockModelList() {
+    /**
+     * Gets the list of anchor models tracked by this instance.
+     *
+     * @return The list of {@link ChunkAnchorBlockModel}.
+     */
+    @Override
+    public List<ChunkAnchorBlockModel> chunkAnchorBlockModelList() {
         return chunkAnchorBlockModelList;
     }
 
-    public void setChunkAnchorBlockModelList(List<ChunkAnchorBlockModel> chunkAnchorBlockModelList) {
-        ScreenAnchorTrackerModel.chunkAnchorBlockModelList = chunkAnchorBlockModelList;
-    }
-
     @Override
-    public String toString(){
-        return "ScreenAnchorTrackerModel{list:" + chunkAnchorBlockModelList.toString() + "}";
+    public String toString() {
+        return "ScreenAnchorTrackerModel{list:" + chunkAnchorBlockModelList + "}";
     }
 }

@@ -5,8 +5,6 @@ import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateH
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class DebugStick extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand usedHand) {
         ItemStack debugStick = player.getItemInHand(usedHand);
         Integer debugMode = debugStick.get(ModDataComponents.DEBUG_STICK_MODE);
         if(debugMode == null){
@@ -62,7 +61,7 @@ public class DebugStick extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         Integer debugMode = stack.get(ModDataComponents.DEBUG_STICK_MODE);
         if(debugMode != null && debugMode > 0){
             tooltipComponents.add(Component.translatable(DESCRIPTION_MODE + "_" + debugMode));

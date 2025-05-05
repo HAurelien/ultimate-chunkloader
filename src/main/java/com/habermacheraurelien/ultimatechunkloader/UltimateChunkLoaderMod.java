@@ -2,8 +2,6 @@ package com.habermacheraurelien.ultimatechunkloader;
 
 import com.habermacheraurelien.ultimatechunkloader.block.ModBlocks;
 import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.ChunkUpdateHandler;
-import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.ChunkAnchorHandler;
-import com.habermacheraurelien.ultimatechunkloader.chunkLoaderLogic.chunkAnchorHandler.PlayerTracker;
 import com.habermacheraurelien.ultimatechunkloader.component.ModDataComponents;
 import com.habermacheraurelien.ultimatechunkloader.creativemodtab.ModCreativeModTabClass;
 import com.habermacheraurelien.ultimatechunkloader.item.ModItems;
@@ -47,10 +45,8 @@ public class UltimateChunkLoaderMod {
 
         // Get the ticketHelper class
         TICKET_CONTROLLER = new TicketController(ResourceLocation.fromNamespaceAndPath("chunkloaders", "chunks"),
-                ((level, ticketHelper) -> {
-                    level.getServer().getAllLevels().forEach(lvl ->
-                            ChunkUpdateHandler.get(level).setTicketHelper(ticketHelper));
-                })
+                ((level, ticketHelper) -> level.getServer().getAllLevels().forEach(lvl ->
+                        ChunkUpdateHandler.get(level).setTicketHelper(ticketHelper)))
         );
     }
 

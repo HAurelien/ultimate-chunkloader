@@ -21,8 +21,8 @@ public class ChunkAnchorBlock extends Block {
     }
 
     @Override
-    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
-                                                        BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player,
+                                                        @NotNull BlockHitResult hitResult) {
         if(!level.isClientSide){
             ChunkAnchorHandler.registerBlockToPlayer(pos, level, player.getUUID());
         }
@@ -30,13 +30,13 @@ public class ChunkAnchorBlock extends Block {
     }
 
     @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+    protected void onPlace(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState oldState, boolean movedByPiston) {
         ChunkAnchorHandler.registerAnchor(state, level, pos, oldState);
         super.onPlace(state, level, pos, oldState, movedByPiston);
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, boolean willHarvest, @NotNull FluidState fluid) {
         // TODO: add blockstate when anchor active to know if can be destroyed from client
         if(!ChunkAnchorHandler.canRemoveAnchor(pos, level) || level.isClientSide){
             return false;
@@ -46,7 +46,7 @@ public class ChunkAnchorBlock extends Block {
     }
 
     @Override
-    public void onDestroyedByPushReaction(BlockState state, Level level, BlockPos pos, Direction pushDirection, FluidState fluid) {
+    public void onDestroyedByPushReaction(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Direction pushDirection, @NotNull FluidState fluid) {
         // TODO: add blockstate when anchor active to know if can be destroyed from client
         if(!ChunkAnchorHandler.canRemoveAnchor(pos, level) || level.isClientSide){
             return;
