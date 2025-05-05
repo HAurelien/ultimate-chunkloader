@@ -1,6 +1,5 @@
 {
-  "creativetab.ultimatechunkloader.command_tab": "Debug items",
-  "creativetab.ultimatechunkloader.block_tab": "Block",
+  "creativetab.ultimatechunkloader.mod_tab": "ChunkLoader",
 
   "item.ultimatechunkloader.chunk_remote": "Chunk remote",
 

@@ -1,6 +1,5 @@
 {
-  "creativetab.ultimatechunkloader.command_tab": "Item de débug",
-  "creativetab.ultimatechunkloader.block_tab": "Blocks",
+  "creativetab.ultimatechunkloader.mod_tab": "ChunkLoader",
 
   "item.ultimatechunkloader.chunk_remote": "Télécommande de chunk",
 
