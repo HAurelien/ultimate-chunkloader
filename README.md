@@ -16,12 +16,12 @@ Once you have installed it, you will need two things for it to function : an Anc
 
 The anchor
 
-![Anchor](https://github.com/HAurelien/ultimate-chunkloader/blob/images/anchor_crafting.png)
+![Anchor](https://github.com/HAurelien/ultimate-chunkloader/blob/main/images/anchor_crafting.png)
 
 
 The remote
 
-![Remote](https://github.com/HAurelien/ultimate-chunkloader/blob/images/remote_crafting.png)
+![Remote](https://github.com/HAurelien/ultimate-chunkloader/blob/main/images/remote_crafting.png)
 
 ### The Anchor
 
@@ -32,7 +32,7 @@ Once the anchor have been placed in a chunk, all you need to do is to interact w
 When you use the remote, you will be displayed all the anchors you have interacted with, allowing you to turn them on and off, as well as renaming or removing them. (The list, as well as the names it contains, are personal) 
 
 
-![Chunk list](https://github.com/HAurelien/ultimate-chunkloader/blob/images/chunk_list.png)
+![Chunk list](https://github.com/HAurelien/ultimate-chunkloader/blob/main/images/chunk_list.png)
 
 Multiple players can add the same anchor to their list and activate/deactivate it at will.
 
