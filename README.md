@@ -1,25 +1,45 @@
 
-Installation information
-=======
+# Ultimate ChunkLoader
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+Starting from a joke between a few friends and me, this mod came to life as my first experience in the minecraft modding community.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+With this mod, you can easily load any chunk of the map on your server whenever you need to. Just interact once with it, and it will be added to the list of known anchors for you to turn on or off whenever you need to thanks to the remote.
+The original reason behind this mod was the possibility to access remote services from other mods requiring the chunk to be loaded, while keeping a minimum server load. Working through multiple dimensions, I wanted to keep it as user-friendly as possible.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+## How to use
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+
+Once you have installed it, you will need two things for it to function : an Anchor, and a remote.
+
+### Crafting
+
+The anchor
+
+![Anchor](https://github.com/HAurelien/ultimate-chunkloader/blob/images/anchor_crafting.png)
+
+
+The remote
+
+![Remote](https://github.com/HAurelien/ultimate-chunkloader/blob/images/remote_crafting.png)
+
+### The Anchor
+
+Once the anchor have been placed in a chunk, all you need to do is to interact with it. Once that's done, you can use the remote, to display all the anchors you know.
+
+### The Remote
+
+When you use the remote, you will be displayed all the anchors you have interacted with, allowing you to turn them on and off, as well as renaming or removing them. (The list, as well as the names it contains, are personal) 
+
+
+![Chunk list](https://github.com/HAurelien/ultimate-chunkloader/blob/images/chunk_list.png)
+
+Multiple players can add the same anchor to their list and activate/deactivate it at will.
+
+## Technical information
+
+- The mod is currently only compatible with Minecraft Neoforge 1.21.1
+- For more information about the actual limitations of the mod, the following page is explanation : https://gist.github.com/Drovolon/24bfaae00d57e7a8ca64b792e14fa7c6
+- If you feel like you encounter any bug, or feel like a critical feature is missing, feel free to report it in this repository's "issues" page
+
+
